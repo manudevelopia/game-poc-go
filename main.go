@@ -12,8 +12,8 @@ var bowser_fury_img *ebiten.Image
 
 func init() {
 	var err error
-	bowser_img, _, err = ebitenutil.NewImageFromFile("bowser.png")
-	bowser_fury_img, _, err = ebitenutil.NewImageFromFile("bowser_fury.png")
+	bowser_img, _, err = ebitenutil.NewImageFromFile("img/bowser.png")
+	bowser_fury_img, _, err = ebitenutil.NewImageFromFile("img/bowser_fury.png")
 	if err != nil {
 		log.Fatal(err)
 	}

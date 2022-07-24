@@ -7,9 +7,6 @@ import (
 	"log"
 )
 
-var bowser_img *ebiten.Image
-var bowser_fury_img *ebiten.Image
-
 const (
 	screenWidth       = 640
 	screenHeight      = 480
@@ -17,58 +14,55 @@ const (
 	screenHeightLimit = 440
 )
 
-func init() {
+func loadImage(filename string) *ebiten.Image {
 	var err error
-	bowser_img, _, err = ebitenutil.NewImageFromFile("img/bowser.png")
-	bowser_fury_img, _, err = ebitenutil.NewImageFromFile("img/bowser_fury.png")
+	img, _, err := ebitenutil.NewImageFromFile("img/" + filename)
 	if err != nil {
 		log.Fatal(err)
 	}
+	return img
 }
 
 type Game struct {
+	bowser Character
 }
 
-func (g *Game) Update() error {
-	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) && bowser_x < screenWidthLimit {
-		bowser_x += bowser_speed
-	} else if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) && bowser_x > 0 {
-		bowser_x -= bowser_speed
-	} else if ebiten.IsKeyPressed(ebiten.KeyArrowUp) && bowser_y > 0 {
-		bowser_y -= bowser_speed
-	} else if ebiten.IsKeyPressed(ebiten.KeyArrowDown) && bowser_y < screenHeightLimit {
-		bowser_y += bowser_speed
+func (game *Game) Update() error {
+	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) && game.bowser.x < screenWidthLimit {
+		game.bowser.moveRight()
+	} else if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) && game.bowser.x > 0 {
+		game.bowser.moveLeft()
+	} else if ebiten.IsKeyPressed(ebiten.KeyArrowUp) && game.bowser.y > 0 {
+		game.bowser.moveUp()
+	} else if ebiten.IsKeyPressed(ebiten.KeyArrowDown) && game.bowser.y < screenHeightLimit {
+		game.bowser.moveDown()
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyA) {
-		bowser_fury = !bowser_fury
+		game.bowser.changeFuryStatus()
 	}
 	return nil
 }
 
-var bowser_x = 0
-var bowser_y = 0
-var bowser_speed = 3
-var bowser_fury = false
-
-func (g *Game) Draw(screen *ebiten.Image) {
+func (game *Game) Draw(screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(float64(bowser_x), float64(bowser_y))
-
-	if bowser_fury == true {
-		screen.DrawImage(bowser_fury_img, op)
+	op.GeoM.Translate(float64(game.bowser.x), float64(game.bowser.y))
+	if game.bowser.fury == true {
+		screen.DrawImage(game.bowser.fury_img, op)
 	} else {
-		screen.DrawImage(bowser_img, op)
+		screen.DrawImage(game.bowser.img, op)
 	}
 }
 
-func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
+func (game *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
 	return outsideWidth, outsideHeight
 }
 
 func main() {
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	ebiten.SetWindowTitle("Hello, World!")
-	if err := ebiten.RunGame(&Game{}); err != nil {
+	if err := ebiten.RunGame(&Game{
+		Character{0, 0, 3, false,
+			loadImage("bowser.png"), loadImage("bowser_fury.png")}}); err != nil {
 		log.Fatal(err)
 	}
 }

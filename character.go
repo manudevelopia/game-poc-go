@@ -11,22 +11,22 @@ type Character struct {
 	fury_img *ebiten.Image
 }
 
-func (character Character) moveRight() {
+func (character *Character) moveRight() {
 	character.x += character.speed
 }
 
-func (character Character) moveLeft() {
+func (character *Character) moveLeft() {
 	character.x -= character.speed
 }
 
-func (character Character) moveUp() {
+func (character *Character) moveUp() {
 	character.y -= character.speed
 }
 
-func (character Character) moveDown() {
+func (character *Character) moveDown() {
 	character.y += character.speed
 }
 
-func (character Character) changeFuryStatus() {
+func (character *Character) changeFuryStatus() {
 	character.fury = !character.fury
 }

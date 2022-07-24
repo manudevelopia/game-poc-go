@@ -10,6 +10,13 @@ import (
 var bowser_img *ebiten.Image
 var bowser_fury_img *ebiten.Image
 
+const (
+	screenWidth       = 640
+	screenHeight      = 480
+	screenWidthLimit  = 600
+	screenHeightLimit = 440
+)
+
 func init() {
 	var err error
 	bowser_img, _, err = ebitenutil.NewImageFromFile("img/bowser.png")
@@ -23,13 +30,13 @@ type Game struct {
 }
 
 func (g *Game) Update() error {
-	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) {
+	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) && bowser_x < screenWidthLimit {
 		bowser_x += bowser_speed
-	} else if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) {
+	} else if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) && bowser_x > 0 {
 		bowser_x -= bowser_speed
-	} else if ebiten.IsKeyPressed(ebiten.KeyArrowUp) {
+	} else if ebiten.IsKeyPressed(ebiten.KeyArrowUp) && bowser_y > 0 {
 		bowser_y -= bowser_speed
-	} else if ebiten.IsKeyPressed(ebiten.KeyArrowDown) {
+	} else if ebiten.IsKeyPressed(ebiten.KeyArrowDown) && bowser_y < screenHeightLimit {
 		bowser_y += bowser_speed
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyA) {
@@ -55,11 +62,11 @@ func (g *Game) Draw(screen *ebiten.Image) {
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return 640, 480
+	return outsideWidth, outsideHeight
 }
 
 func main() {
-	ebiten.SetWindowSize(640, 480)
+	ebiten.SetWindowSize(screenWidth, screenHeight)
 	ebiten.SetWindowTitle("Hello, World!")
 	if err := ebiten.RunGame(&Game{}); err != nil {
 		log.Fatal(err)

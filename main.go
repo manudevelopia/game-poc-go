@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"image"
 	_ "image/png"
 	"log"
 )
@@ -25,9 +26,19 @@ func loadImage(filename string) *ebiten.Image {
 
 type Game struct {
 	bowser Character
+	count  int
 }
 
+const (
+	frameOX     = 0
+	frameOY     = 68
+	frameWidth  = 71
+	frameHeight = 68
+	frameNum    = 4
+)
+
 func (game *Game) Update() error {
+	game.count++
 	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) && game.bowser.x < screenWidthLimit {
 		game.bowser.moveRight()
 	} else if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) && game.bowser.x > 0 {
@@ -46,11 +57,10 @@ func (game *Game) Update() error {
 func (game *Game) Draw(screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(float64(game.bowser.x), float64(game.bowser.y))
-	if game.bowser.fury == true {
-		screen.DrawImage(game.bowser.fury_img, op)
-	} else {
-		screen.DrawImage(game.bowser.img, op)
-	}
+
+	i := (game.count / 5) % frameNum
+	sx, sy := frameOX+i*frameWidth, frameOY*game.bowser.state
+	screen.DrawImage(game.bowser.img.SubImage(image.Rect(sx, sy, sx+frameWidth, sy+frameHeight)).(*ebiten.Image), op)
 }
 
 func (game *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
@@ -61,8 +71,9 @@ func main() {
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	ebiten.SetWindowTitle("Hello, World!")
 	if err := ebiten.RunGame(&Game{
-		Character{0, screenHeightLimit, 3, false,
-			loadImage("bowser.png"), loadImage("bowser_fury.png")}}); err != nil {
+		Character{0, screenHeightLimit, 3, WalkingUp, false,
+			loadImage("bowser_tile.png"),
+			loadImage("bowser_fury.png")}, 0}); err != nil {
 		log.Fatal(err)
 	}
 }

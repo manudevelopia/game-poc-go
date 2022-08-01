@@ -10,7 +10,7 @@ import (
 const (
 	screenWidth       = 640
 	screenHeight      = 480
-	screenWidthLimit  = 600
+	screenWidthLimit  = 620
 	screenHeightLimit = 440
 )
 
@@ -61,7 +61,7 @@ func main() {
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	ebiten.SetWindowTitle("Hello, World!")
 	if err := ebiten.RunGame(&Game{
-		Character{0, 0, 3, false,
+		Character{0, screenHeightLimit, 3, false,
 			loadImage("bowser.png"), loadImage("bowser_fury.png")}}); err != nil {
 		log.Fatal(err)
 	}

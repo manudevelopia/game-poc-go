@@ -26,15 +26,19 @@ func loadImage(filename string) *ebiten.Image {
 
 type Game struct {
 	bowser Character
+	peach  Character
 	count  int
 }
 
 const (
-	frameOX     = 0
-	frameOY     = 68
-	frameWidth  = 71
-	frameHeight = 68
-	frameNum    = 4
+	frameOX           = 0
+	frameBowserOY     = 68
+	frameBowserWidth  = 71
+	frameBowserHeight = 68
+	framePeachOY      = 68
+	framePeachWidth   = 71
+	framePeachHeight  = 68
+	frameNum          = 4
 )
 
 func (game *Game) Update() error {
@@ -51,16 +55,32 @@ func (game *Game) Update() error {
 	if ebiten.IsKeyPressed(ebiten.KeyA) {
 		game.bowser.changeFuryStatus()
 	}
+	if ebiten.IsKeyPressed(ebiten.KeyD) && game.peach.x < screenWidthLimit {
+		game.peach.moveRight()
+	} else if ebiten.IsKeyPressed(ebiten.KeyA) && game.peach.x > 0 {
+		game.peach.moveLeft()
+	} else if ebiten.IsKeyPressed(ebiten.KeyW) && game.peach.y > 0 {
+		game.peach.moveUp()
+	} else if ebiten.IsKeyPressed(ebiten.KeyS) && game.peach.y < screenHeightLimit {
+		game.peach.moveDown()
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyQ) {
+		game.peach.changeFuryStatus()
+	}
 	return nil
 }
 
 func (game *Game) Draw(screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(float64(game.bowser.x), float64(game.bowser.y))
+	op2 := &ebiten.DrawImageOptions{}
+	op2.GeoM.Translate(float64(game.peach.x), float64(game.peach.y))
 
 	i := (game.count / 5) % frameNum
-	sx, sy := frameOX+i*frameWidth, frameOY*game.bowser.state
-	screen.DrawImage(game.bowser.img.SubImage(image.Rect(sx, sy, sx+frameWidth, sy+frameHeight)).(*ebiten.Image), op)
+	sx, sy := frameOX+i*frameBowserWidth, frameBowserOY*game.bowser.state
+	screen.DrawImage(game.bowser.img.SubImage(image.Rect(sx, sy, sx+frameBowserWidth, sy+frameBowserHeight)).(*ebiten.Image), op)
+	sx2, sy2 := frameOX+i*framePeachWidth, framePeachOY*game.peach.state
+	screen.DrawImage(game.peach.img.SubImage(image.Rect(sx2, sy2, sx2+framePeachWidth, sy2+framePeachHeight)).(*ebiten.Image), op2)
 }
 
 func (game *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
@@ -73,6 +93,9 @@ func main() {
 	if err := ebiten.RunGame(&Game{
 		Character{0, screenHeightLimit, 3, WalkingUp, false,
 			loadImage("bowser_tile.png"),
+			loadImage("bowser_fury.png")},
+		Character{0, screenHeightLimit, 3, WalkingUp, false,
+			loadImage("peach_tile.png"),
 			loadImage("bowser_fury.png")}, 0}); err != nil {
 		log.Fatal(err)
 	}

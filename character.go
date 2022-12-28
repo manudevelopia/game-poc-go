@@ -3,13 +3,13 @@ package main
 import "github.com/hajimehoshi/ebiten/v2"
 
 type Character struct {
-	x        int
-	y        int
-	speed    int
-	state    int
-	fury     bool
-	img      *ebiten.Image
-	fury_img *ebiten.Image
+	x       int
+	y       int
+	speed   int
+	state   int
+	fury    bool
+	img     *ebiten.Image
+	furyImg *ebiten.Image
 }
 
 const (

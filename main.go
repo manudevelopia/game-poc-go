@@ -71,6 +71,10 @@ func (game *Game) Update() error {
 }
 
 func (game *Game) Draw(screen *ebiten.Image) {
+	if checkCollision(game.peach, game.bowser) {
+		ebitenutil.DebugPrint(screen, "I gotcha you")
+	}
+
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(float64(game.bowser.x), float64(game.bowser.y))
 	op2 := &ebiten.DrawImageOptions{}
@@ -81,6 +85,12 @@ func (game *Game) Draw(screen *ebiten.Image) {
 	screen.DrawImage(game.bowser.img.SubImage(image.Rect(sx, sy, sx+frameBowserWidth, sy+frameBowserHeight)).(*ebiten.Image), op)
 	sx2, sy2 := frameOX+i*framePeachWidth, framePeachOY*game.peach.state
 	screen.DrawImage(game.peach.img.SubImage(image.Rect(sx2, sy2, sx2+framePeachWidth, sy2+framePeachHeight)).(*ebiten.Image), op2)
+}
+
+func checkCollision(one Character, two Character) bool {
+	collisionX := one.x+71 >= two.x && two.x+71 >= one.x
+	collisionY := one.y+68 >= two.y && two.y+68 >= one.y
+	return collisionX && collisionY
 }
 
 func (game *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {

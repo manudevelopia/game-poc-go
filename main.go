@@ -13,24 +13,7 @@ const (
 	screenHeight      = 480
 	screenWidthLimit  = 620
 	screenHeightLimit = 440
-)
 
-func loadImage(filename string) *ebiten.Image {
-	var err error
-	img, _, err := ebitenutil.NewImageFromFile("img/" + filename)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return img
-}
-
-type Game struct {
-	bowser Character
-	peach  Character
-	count  int
-}
-
-const (
 	frameOX           = 0
 	frameBowserOY     = 68
 	frameBowserWidth  = 71
@@ -40,6 +23,12 @@ const (
 	framePeachHeight  = 68
 	frameNum          = 4
 )
+
+type Game struct {
+	bowser Character
+	peach  Character
+	count  int
+}
 
 func (game *Game) Update() error {
 	game.count++

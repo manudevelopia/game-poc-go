@@ -14,66 +14,58 @@ const (
 	screenWidthLimit  = 620
 	screenHeightLimit = 440
 
-	frameOX           = 0
-	frameBowserOY     = 68
-	frameBowserWidth  = 71
-	frameBowserHeight = 68
-	framePeachOY      = 68
-	framePeachWidth   = 71
-	framePeachHeight  = 68
+	frameOX          = 0
+	framePlayerOY     = 68
+	framePlayerWidth  = 71
+	framePlayerHeight = 68
 	frameNum          = 4
 )
 
 type Game struct {
-	bowser Character
-	peach  Character
-	count  int
+	players []Character
+	count   int
 }
 
 func (game *Game) Update() error {
 	game.count++
-	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) && game.bowser.x < screenWidthLimit {
-		game.bowser.moveRight()
-	} else if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) && game.bowser.x > 0 {
-		game.bowser.moveLeft()
-	} else if ebiten.IsKeyPressed(ebiten.KeyArrowUp) && game.bowser.y > 0 {
-		game.bowser.moveUp()
-	} else if ebiten.IsKeyPressed(ebiten.KeyArrowDown) && game.bowser.y < screenHeightLimit {
-		game.bowser.moveDown()
+	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) && game.players[0].x < screenWidthLimit {
+		game.players[0].moveRight()
+	} else if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) && game.players[0].x > 0 {
+		game.players[0].moveLeft()
+	} else if ebiten.IsKeyPressed(ebiten.KeyArrowUp) && game.players[0].y > 0 {
+		game.players[0].moveUp()
+	} else if ebiten.IsKeyPressed(ebiten.KeyArrowDown) && game.players[0].y < screenHeightLimit {
+		game.players[0].moveDown()
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyA) {
-		game.bowser.changeFuryStatus()
+		game.players[0].changeFuryStatus()
 	}
-	if ebiten.IsKeyPressed(ebiten.KeyD) && game.peach.x < screenWidthLimit {
-		game.peach.moveRight()
-	} else if ebiten.IsKeyPressed(ebiten.KeyA) && game.peach.x > 0 {
-		game.peach.moveLeft()
-	} else if ebiten.IsKeyPressed(ebiten.KeyW) && game.peach.y > 0 {
-		game.peach.moveUp()
-	} else if ebiten.IsKeyPressed(ebiten.KeyS) && game.peach.y < screenHeightLimit {
-		game.peach.moveDown()
+	if ebiten.IsKeyPressed(ebiten.KeyD) && game.players[1].x < screenWidthLimit {
+		game.players[1].moveRight()
+	} else if ebiten.IsKeyPressed(ebiten.KeyA) && game.players[1].x > 0 {
+		game.players[1].moveLeft()
+	} else if ebiten.IsKeyPressed(ebiten.KeyW) && game.players[1].y > 0 {
+		game.players[1].moveUp()
+	} else if ebiten.IsKeyPressed(ebiten.KeyS) && game.players[1].y < screenHeightLimit {
+		game.players[1].moveDown()
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyQ) {
-		game.peach.changeFuryStatus()
+		game.players[1].changeFuryStatus()
 	}
 	return nil
 }
 
 func (game *Game) Draw(screen *ebiten.Image) {
-	if checkCollision(game.peach, game.bowser) {
+	if checkCollision(game.players[1], game.players[0]) {
 		ebitenutil.DebugPrint(screen, "I gotcha you")
 	}
-
-	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(float64(game.bowser.x), float64(game.bowser.y))
-	op2 := &ebiten.DrawImageOptions{}
-	op2.GeoM.Translate(float64(game.peach.x), float64(game.peach.y))
-
-	i := (game.count / 5) % frameNum
-	sx, sy := frameOX+i*frameBowserWidth, frameBowserOY*game.bowser.state
-	screen.DrawImage(game.bowser.img.SubImage(image.Rect(sx, sy, sx+frameBowserWidth, sy+frameBowserHeight)).(*ebiten.Image), op)
-	sx2, sy2 := frameOX+i*framePeachWidth, framePeachOY*game.peach.state
-	screen.DrawImage(game.peach.img.SubImage(image.Rect(sx2, sy2, sx2+framePeachWidth, sy2+framePeachHeight)).(*ebiten.Image), op2)
+	frameSpot := (game.count / 5) % frameNum
+	for i := 0; i < len(game.players); i++ {
+		op := &ebiten.DrawImageOptions{}
+		op.GeoM.Translate(float64(game.players[i].x), float64(game.players[i].y))
+		sx, sy := frameOX+frameSpot*framePlayerWidth, framePlayerOY*game.players[i].state
+		screen.DrawImage(game.players[i].img.SubImage(image.Rect(sx, sy, sx+framePlayerWidth, sy+framePlayerHeight)).(*ebiten.Image), op)
+	}
 }
 
 func checkCollision(one Character, two Character) bool {
@@ -90,12 +82,10 @@ func main() {
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	ebiten.SetWindowTitle("Hello, World!")
 	if err := ebiten.RunGame(&Game{
-		Character{0, screenHeightLimit, 3, WalkingUp, false,
-			loadImage("bowser_tile.png"),
-			loadImage("bowser_fury.png")},
-		Character{0, screenHeightLimit, 3, WalkingUp, false,
-			loadImage("peach_tile.png"),
-			loadImage("bowser_fury.png")}, 0}); err != nil {
+		[]Character{
+			{0, screenHeightLimit, 3, WalkingUp, false, loadImage("bowser_tile.png"), loadImage("bowser_fury.png")},
+			{0, screenHeightLimit, 3, WalkingUp, false, loadImage("peach_tile.png"), loadImage("bowser_fury.png")},
+		}, 0}); err != nil {
 		log.Fatal(err)
 	}
 }

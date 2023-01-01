@@ -14,7 +14,7 @@ const (
 	screenWidthLimit  = 620
 	screenHeightLimit = 440
 
-	frameOX          = 0
+	frameOX           = 0
 	framePlayerOY     = 68
 	framePlayerWidth  = 71
 	framePlayerHeight = 68

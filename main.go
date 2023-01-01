@@ -23,11 +23,11 @@ const (
 
 type Game struct {
 	players []Character
-	count   int
 }
 
+var frame = 0
+
 func (game *Game) Update() error {
-	game.count++
 	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) && game.players[0].x < screenWidthLimit {
 		game.players[0].moveRight()
 	} else if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) && game.players[0].x > 0 {
@@ -56,15 +56,16 @@ func (game *Game) Update() error {
 }
 
 func (game *Game) Draw(screen *ebiten.Image) {
-	if checkCollision(game.players[1], game.players[0]) {
-		ebitenutil.DebugPrint(screen, "I gotcha you")
-	}
-	frameSpot := (game.count / 5) % frameNum
+	frame++
+	frame := (frame / 5) % frameNum
 	for i := 0; i < len(game.players); i++ {
 		op := &ebiten.DrawImageOptions{}
 		op.GeoM.Translate(float64(game.players[i].x), float64(game.players[i].y))
-		sx, sy := frameOX+frameSpot*framePlayerWidth, framePlayerOY*game.players[i].state
+		sx, sy := frameOX+frame*framePlayerWidth, framePlayerOY*game.players[i].state
 		screen.DrawImage(game.players[i].img.SubImage(image.Rect(sx, sy, sx+framePlayerWidth, sy+framePlayerHeight)).(*ebiten.Image), op)
+	}
+	if checkCollision(game.players[1], game.players[0]) {
+		ebitenutil.DebugPrint(screen, "I gotcha you")
 	}
 }
 
@@ -85,7 +86,7 @@ func main() {
 		[]Character{
 			{0, screenHeightLimit, 3, WalkingUp, false, loadImage("bowser_tile.png"), loadImage("bowser_fury.png")},
 			{0, screenHeightLimit, 3, WalkingUp, false, loadImage("peach_tile.png"), loadImage("bowser_fury.png")},
-		}, 0}); err != nil {
+		}}); err != nil {
 		log.Fatal(err)
 	}
 }
